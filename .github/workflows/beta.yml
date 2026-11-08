@@ -1,0 +1,57 @@
+name: Build beta APK
+
+on:
+  push:
+    branches: [main, master, justanotherplayer]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Build APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleLatestUniversalDebug --stacktrace
+
+      - name: Collect APK
+        run: |
+          mkdir -p out
+          cp app/build/outputs/apk/latestUniversal/debug/*.apk out/JustAnotherPlayer-beta.apk
+          ls -la out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: JustAnotherPlayer-beta
+          path: out/JustAnotherPlayer-beta.apk
+
+      - name: Publish to the "beta" release (fixed download link)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: beta
+          name: JustAnotherPlayer beta
+          prerelease: true
+          make_latest: false
+          body: |
+            Beta build from commit ${{ github.sha }}.
+            Download JustAnotherPlayer-beta.apk below and install it on the TV.
+          files: out/JustAnotherPlayer-beta.apk
+
+      - name: Move the "beta" tag to this commit
+        run: |
+          git tag -f beta
+          git push -f origin beta
