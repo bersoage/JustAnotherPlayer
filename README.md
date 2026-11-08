@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/logos/logo-a-icono-dos-lineas-fondo-oscuro.png" alt="JustAnotherPlayer" width="560"></p>
+<p align="center"><img src="docs/logos/logo-b-horizontal-fondo-oscuro.png" alt="JustAnotherPlayer" width="560"></p>
 
 # JustAnotherPlayer
 
