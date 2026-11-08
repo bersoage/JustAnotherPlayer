@@ -79,4 +79,12 @@
     <string name="pref_about_header">Acerca de</string>
     <string name="pref_about_based_on">Basado en Just (Video) Player</string>
     <string name="pref_about_based_on_summary">De Marcel Dopita (moneytoo)</string>
+    <string name="effects_open">Efectos: graves, agudos y eco</string>
+    <string name="effects_title">Efectos</string>
+    <string name="effects_bass">Graves</string>
+    <string name="effects_treble">Agudos</string>
+    <string name="effects_echo">Eco</string>
+    <string name="effects_echo_off">Apagado</string>
+    <string name="effects_reset">Restablecer efectos</string>
+    <string name="effects_back">Volver al sonido</string>
 </resources>

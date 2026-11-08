@@ -82,4 +82,12 @@
     <string name="pref_about_signature" translatable="false">@Sr.BernS - Bernardo Soage - Corrientes Argentina</string>
     <string name="pref_about_based_on">Based on Just (Video) Player</string>
     <string name="pref_about_based_on_summary">By Marcel Dopita (moneytoo)</string>
+    <string name="effects_open">Effects: bass, treble and echo</string>
+    <string name="effects_title">Effects</string>
+    <string name="effects_bass">Bass</string>
+    <string name="effects_treble">Treble</string>
+    <string name="effects_echo">Echo</string>
+    <string name="effects_echo_off">Off</string>
+    <string name="effects_reset">Reset effects</string>
+    <string name="effects_back">Back to sound</string>
 </resources>

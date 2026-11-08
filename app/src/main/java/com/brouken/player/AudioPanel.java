@@ -32,6 +32,9 @@ final class AudioPanel {
     private static final String KEY_BALANCE = "balance";
     private static final String KEY_DELAY = "delay";
     private static final String KEY_VOICE = "voice";
+    static final String KEY_BASS = "bass";
+    static final String KEY_TREBLE = "treble";
+    static final String KEY_ECHO = "echo";
 
     private AudioPanel() {
     }
@@ -42,9 +45,16 @@ final class AudioPanel {
         AudioAdjustProcessor.gainDb = p.getFloat(KEY_GAIN, 0f);
         AudioAdjustProcessor.balance = p.getFloat(KEY_BALANCE, 0f);
         AudioAdjustProcessor.voiceDb = p.getInt(KEY_VOICE, 3);
+        AudioAdjustProcessor.bassDb = clampFx(p.getInt(KEY_BASS, 0));
+        AudioAdjustProcessor.trebleDb = clampFx(p.getInt(KEY_TREBLE, 0));
+        AudioAdjustProcessor.echoPct = Math.max(0, Math.min(100, p.getInt(KEY_ECHO, 0)));
         int d = p.getInt(KEY_DELAY, 0);
         AudioAdjustProcessor.delayMs = Math.max(-AudioAdjustProcessor.MAX_DELAY_MS,
                 Math.min(AudioAdjustProcessor.MAX_DELAY_MS, d));
+    }
+
+    private static int clampFx(int v) {
+        return Math.max(-AudioAdjustProcessor.MAX_FX_DB, Math.min(AudioAdjustProcessor.MAX_FX_DB, v));
     }
 
     static void persist(Context context) {
@@ -53,6 +63,9 @@ final class AudioPanel {
                 .putFloat(KEY_BALANCE, AudioAdjustProcessor.balance)
                 .putInt(KEY_VOICE, AudioAdjustProcessor.voiceDb)
                 .putInt(KEY_DELAY, AudioAdjustProcessor.delayMs)
+                .putInt(KEY_BASS, AudioAdjustProcessor.bassDb)
+                .putInt(KEY_TREBLE, AudioAdjustProcessor.trebleDb)
+                .putInt(KEY_ECHO, AudioAdjustProcessor.echoPct)
                 .apply();
     }
 
@@ -73,6 +86,7 @@ final class AudioPanel {
         TextView syncValue = v.findViewById(R.id.audio_sync_value);
         Button syncOpen = v.findViewById(R.id.audio_sync_open);
         Button reset = v.findViewById(R.id.audio_reset);
+        Button effectsOpen = v.findViewById(R.id.audio_effects_open);
         RadioGroup hdrGroup = v.findViewById(R.id.video_hdr_mode);
         RadioButton hdrDv = v.findViewById(R.id.video_hdr_dv);
         RadioButton hdr10 = v.findViewById(R.id.video_hdr_10);
@@ -173,6 +187,11 @@ final class AudioPanel {
             if (onOpenSync != null) onOpenSync.run();
         });
 
+        effectsOpen.setOnClickListener(view -> {
+            dialog.dismiss();
+            EffectsPanel.show(context, () -> show(context, onHdrModeChanged, onOpenSync));
+        });
+
         // Diagnostics, refreshed while the panel is open.
         final Handler handler = new Handler(Looper.getMainLooper());
         final boolean[] open = {true};
@@ -190,6 +209,19 @@ final class AudioPanel {
         dialog.setOnShowListener(d -> gain.requestFocus());
         dialog.show();
 
+        Window w = dialog.getWindow();
+        if (w != null) {
+            DisplayMetrics dm = context.getResources().getDisplayMetrics();
+            int width = Math.min(Math.round(340 * dm.density), Math.round(dm.widthPixels * 0.45f));
+            w.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
+            w.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            w.setBackgroundDrawable(new ColorDrawable(0xE6181818));
+            w.setLayout(width, WindowManager.LayoutParams.MATCH_PARENT);
+        }
+    }
+
+    /** Shared look for the side-column dialogs. */
+    static void styleSidePanel(Context context, AlertDialog dialog) {
         Window w = dialog.getWindow();
         if (w != null) {
             DisplayMetrics dm = context.getResources().getDisplayMetrics();
