@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Floating strip over the video, so lips stay visible while adjusting sync. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/sync_overlay_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingStart="20dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="8dp">
+
+  <TextView
+      android:id="@+id/sync_value"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textColor="#FFFFFF"
+      android:textSize="26sp" />
+
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/sync_overlay_hint"
+      android:textColor="#CCCCCC"
+      android:textSize="12sp" />
+
+</LinearLayout>

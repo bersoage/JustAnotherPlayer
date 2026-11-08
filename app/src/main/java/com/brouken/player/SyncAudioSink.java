@@ -1,22 +1,38 @@
 package com.brouken.player;
 
+import androidx.media3.common.Format;
+import androidx.media3.common.MimeTypes;
 import androidx.media3.exoplayer.audio.AudioSink;
 import androidx.media3.exoplayer.audio.ForwardingAudioSink;
 
 /**
- * Shifts the playback clock that the audio renderer reports, so video frames are
- * shown earlier or later than the audio. This moves audio relative to video in
- * both directions without buffering samples, and also works for passthrough
- * (AC3/DTS sent undecoded to the TV or receiver).
+ * 1. Shifts the playback clock that the audio renderer reports, so video frames are
+ *    shown earlier or later than the audio (sync in both directions).
+ *    Clock = real audio position + offset.
+ *     - offset > 0: video runs ahead, so the audio is heard later.
+ *     - offset < 0: video waits, so the audio is heard earlier.
  *
- * Clock = real audio position + offset.
- *  - offset > 0: video runs ahead, so the audio is heard later.
- *  - offset < 0: video waits, so the audio is heard earlier.
+ * 2. Refuses passthrough (AC3/DTS sent undecoded). The player then always decodes the
+ *    audio to PCM, so {@link AudioAdjustProcessor} (balance, boost, downmix) always
+ *    gets audio to work on.
  */
 public final class SyncAudioSink extends ForwardingAudioSink {
 
     public SyncAudioSink(AudioSink sink) {
         super(sink);
+    }
+
+    @Override
+    public boolean supportsFormat(Format format) {
+        return MimeTypes.AUDIO_RAW.equals(format.sampleMimeType) && super.supportsFormat(format);
+    }
+
+    @Override
+    public int getFormatSupport(Format format) {
+        if (!MimeTypes.AUDIO_RAW.equals(format.sampleMimeType)) {
+            return SINK_FORMAT_UNSUPPORTED;
+        }
+        return super.getFormatSupport(format);
     }
 
     @Override

@@ -39,6 +39,7 @@ import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Rational;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -622,7 +623,7 @@ public class PlayerActivity extends Activity {
         buttonAudio.setId(View.generateViewId());
         buttonAudio.setImageResource(R.drawable.ic_volume_up_24dp);
         buttonAudio.setContentDescription(getString(R.string.button_audio));
-        buttonAudio.setOnClickListener(view -> AudioPanel.show(this, this::restartPlayer));
+        buttonAudio.setOnClickListener(view -> AudioPanel.show(this, this::restartPlayer, this::showSyncOverlay));
 
         final HorizontalScrollView horizontalScrollView = (HorizontalScrollView) getLayoutInflater().inflate(R.layout.controls, null);
         final LinearLayout controls = horizontalScrollView.findViewById(R.id.controls);
@@ -763,6 +764,7 @@ public class PlayerActivity extends Activity {
     public void onStop() {
         super.onStop();
         alive = false;
+        hideSyncOverlay();
         if (Build.VERSION.SDK_INT >= 31) {
             playerView.removeCallbacks(barsHider);
         }
@@ -962,8 +964,96 @@ public class PlayerActivity extends Activity {
         return super.onKeyUp(keyCode, event);
     }
 
+    private View syncOverlay;
+    private TextView syncOverlayValue;
+    private final Runnable syncOverlayHider = this::hideSyncOverlay;
+
+    /** Floating strip over the video to adjust audio/video sync while watching lips. */
+    void showSyncOverlay() {
+        if (syncOverlay != null) {
+            return;
+        }
+        final ViewGroup root = findViewById(R.id.coordinatorLayout);
+        syncOverlay = getLayoutInflater().inflate(R.layout.overlay_sync, root, false);
+        syncOverlayValue = syncOverlay.findViewById(R.id.sync_value);
+        syncOverlay.setOnClickListener(v -> hideSyncOverlay());
+
+        final CoordinatorLayout.LayoutParams lp = new CoordinatorLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        lp.topMargin = Math.round(24 * getResources().getDisplayMetrics().density);
+        root.addView(syncOverlay, lp);
+
+        playerView.hideController();
+        updateSyncOverlay();
+        scheduleSyncOverlayHide();
+    }
+
+    void hideSyncOverlay() {
+        playerView.removeCallbacks(syncOverlayHider);
+        if (syncOverlay != null) {
+            final ViewGroup root = findViewById(R.id.coordinatorLayout);
+            root.removeView(syncOverlay);
+            syncOverlay = null;
+            syncOverlayValue = null;
+        }
+    }
+
+    private void scheduleSyncOverlayHide() {
+        playerView.removeCallbacks(syncOverlayHider);
+        playerView.postDelayed(syncOverlayHider, 8000);
+    }
+
+    private void updateSyncOverlay() {
+        if (syncOverlayValue == null) {
+            return;
+        }
+        final int d = AudioAdjustProcessor.delayMs;
+        syncOverlayValue.setText((d > 0 ? "+" : "") + d + " ms");
+    }
+
+    /** Returns true when the key was consumed by the sync strip. */
+    private boolean handleSyncOverlayKey(KeyEvent event) {
+        final int keyCode = event.getKeyCode();
+        final boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                if (down) {
+                    // One press = 50 ms. Holding the key speeds up so 3000 ms is reachable.
+                    final int repeat = event.getRepeatCount();
+                    final int step = repeat < 8 ? 50 : (repeat < 20 ? 100 : 250);
+                    final int dir = keyCode == KeyEvent.KEYCODE_DPAD_RIGHT ? 1 : -1;
+                    AudioAdjustProcessor.delayMs = Math.max(-AudioAdjustProcessor.MAX_DELAY_MS,
+                            Math.min(AudioAdjustProcessor.MAX_DELAY_MS, AudioAdjustProcessor.delayMs + dir * step));
+                    AudioPanel.persist(this);
+                    updateSyncOverlay();
+                    scheduleSyncOverlayHide();
+                }
+                return true;
+            case KeyEvent.KEYCODE_DPAD_UP:
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                return true;
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_NUMPAD_ENTER:
+            case KeyEvent.KEYCODE_BACK:
+            case KeyEvent.KEYCODE_ESCAPE:
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    hideSyncOverlay();
+                }
+                return true;
+            default:
+                return false;
+        }
+    }
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (syncOverlay != null && handleSyncOverlayKey(event)) {
+            return true;
+        }
+
         if (isScaling) {
             final int keyCode = event.getKeyCode();
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
@@ -1235,9 +1325,12 @@ public class PlayerActivity extends Activity {
         DefaultExtractorsFactory extractorsFactory = new DefaultExtractorsFactory()
                 .setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ENABLE_HDMV_DTS_AUDIO_STREAMS)
                 .setTsExtractorTimestampSearchBytes(1500 * TsExtractor.TS_PACKET_SIZE);
-        MediaCodecUtil.setMapDV7ToHevc(mPrefs.mapDV7ToHevc);
         AudioPanel.load(this);
         HdrModeCodecSelector.load(this);
+        // In HDR10 mode the Dolby Vision decoders are hidden, so profile 7 files need to be
+        // mapped to HEVC too; otherwise they have no decoder at all and the picture flickers.
+        MediaCodecUtil.setMapDV7ToHevc(mPrefs.mapDV7ToHevc
+                || HdrModeCodecSelector.mode == HdrModeCodecSelector.MODE_HDR10);
         @SuppressLint("WrongConstant") RenderersFactory renderersFactory = new DefaultRenderersFactory(this) {
             @Override
             protected AudioSink buildAudioSink(Context context, boolean enableFloatOutput, boolean enableAudioTrackPlaybackParams) {

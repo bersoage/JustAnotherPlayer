@@ -1,168 +1,183 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Sized for TV: large text and tap/focus targets, usable with the D-pad. -->
+<!-- Narrow side panel for TV: leaves the video visible. D-pad friendly. -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="24dp">
+    android:layout_height="match_parent"
+    android:padding="14dp">
 
   <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/audio_gain"
-        android:textSize="20sp" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:orientation="horizontal">
 
-      <SeekBar
-          android:id="@+id/audio_gain"
+      <TextView
           android:layout_width="0dp"
           android:layout_height="wrap_content"
           android:layout_weight="1"
-          android:focusable="true"
-          android:minHeight="56dp" />
+          android:text="@string/audio_gain"
+          android:textColor="#FFFFFF"
+          android:textSize="14sp" />
 
       <TextView
           android:id="@+id/audio_gain_value"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:minWidth="96dp"
-          android:gravity="end"
-          android:textSize="20sp" />
+          android:textColor="#FFFFFF"
+          android:textSize="14sp" />
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <SeekBar
+        android:id="@+id/audio_gain"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/audio_balance"
-        android:textSize="20sp" />
+        android:focusable="true"
+        android:minHeight="40dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal">
 
-      <SeekBar
-          android:id="@+id/audio_balance"
+      <TextView
           android:layout_width="0dp"
           android:layout_height="wrap_content"
           android:layout_weight="1"
-          android:focusable="true"
-          android:minHeight="56dp" />
+          android:text="@string/audio_balance"
+          android:textColor="#FFFFFF"
+          android:textSize="14sp" />
 
       <TextView
           android:id="@+id/audio_balance_value"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:minWidth="160dp"
-          android:gravity="end"
-          android:textSize="20sp" />
+          android:textColor="#FFFFFF"
+          android:textSize="14sp" />
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <SeekBar
+        android:id="@+id/audio_balance"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/audio_delay"
-        android:textSize="20sp" />
+        android:focusable="true"
+        android:minHeight="40dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-      <Button
-          android:id="@+id/audio_delay_minus"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:minHeight="56dp"
-          android:minWidth="96dp"
-          android:text="@string/audio_delay_less"
-          android:textSize="20sp" />
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal">
 
       <TextView
-          android:id="@+id/audio_delay_value"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
           android:layout_weight="1"
-          android:gravity="center"
-          android:textSize="24sp" />
+          android:text="@string/audio_voice"
+          android:textColor="#FFFFFF"
+          android:textSize="14sp" />
 
-      <Button
-          android:id="@+id/audio_delay_plus"
+      <TextView
+          android:id="@+id/audio_voice_value"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:minHeight="56dp"
-          android:minWidth="96dp"
-          android:text="@string/audio_delay_more"
-          android:textSize="20sp" />
+          android:textColor="#FFFFFF"
+          android:textSize="14sp" />
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/audio_delay_hint"
-        android:textSize="16sp" />
-
-    <Button
-        android:id="@+id/audio_reset"
+    <SeekBar
+        android:id="@+id/audio_voice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:minHeight="56dp"
-        android:text="@string/audio_reset"
-        android:textSize="20sp" />
+        android:focusable="true"
+        android:minHeight="40dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+      <TextView
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:text="@string/audio_delay"
+          android:textColor="#FFFFFF"
+          android:textSize="14sp" />
+
+      <TextView
+          android:id="@+id/audio_sync_value"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:textColor="#FFFFFF"
+          android:textSize="14sp" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/audio_sync_open"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="44dp"
+        android:text="@string/audio_sync_open"
+        android:textSize="14sp" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="10dp"
         android:text="@string/video_hdr_mode"
-        android:textSize="20sp" />
+        android:textColor="#FFFFFF"
+        android:textSize="14sp" />
 
     <RadioGroup
         android:id="@+id/video_hdr_mode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
       <RadioButton
           android:id="@+id/video_hdr_dv"
-          android:layout_width="0dp"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:minHeight="56dp"
+          android:minHeight="44dp"
           android:focusable="true"
           android:text="@string/video_hdr_dv"
-          android:textSize="20sp" />
+          android:textColor="#FFFFFF"
+          android:textSize="14sp" />
 
       <RadioButton
           android:id="@+id/video_hdr_10"
-          android:layout_width="0dp"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:minHeight="56dp"
+          android:minHeight="44dp"
           android:focusable="true"
           android:text="@string/video_hdr_10"
-          android:textSize="20sp" />
+          android:textColor="#FFFFFF"
+          android:textSize="14sp" />
     </RadioGroup>
 
-    <TextView
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/audio_reset"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/video_hdr_hint"
-        android:textSize="16sp" />
+        android:layout_marginTop="6dp"
+        android:minHeight="44dp"
+        android:text="@string/audio_reset"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/audio_diag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:textColor="#B0B0B0"
+        android:textSize="12sp" />
 
   </LinearLayout>
 </ScrollView>

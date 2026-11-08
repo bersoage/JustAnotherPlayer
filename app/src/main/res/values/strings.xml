@@ -66,13 +66,15 @@
     <string name="audio_balance_left">Left %1$d</string>
     <string name="audio_balance_right">Right %1$d</string>
     <string name="audio_delay">Audio sync</string>
-    <string name="audio_delay_less">-50 ms</string>
-    <string name="audio_delay_more">+50 ms</string>
     <string name="audio_reset">Reset</string>
-    <string name="audio_delay_hint">Negative: audio earlier. Positive: audio later.</string>
     <string name="video_hdr_mode">Video: Dolby Vision or HDR10</string>
     <string name="video_hdr_dv">Dolby Vision</string>
     <string name="video_hdr_10">HDR10</string>
     <string name="video_hdr_hint">For files that carry both. The video restarts at the same point.</string>
     <string name="hdr_fallback">This file is Dolby Vision only. Switched back to Dolby Vision.</string>
+    <string name="audio_voice">Voices (center channel)</string>
+    <string name="audio_sync_open">Adjust sync over the video</string>
+    <string name="audio_diag_idle">Diagnostics: audio is not going through the processor yet. Play a video.</string>
+    <string name="audio_diag_active">Diagnostics: input %1$d ch → output %2$d ch, %3$d Hz, %4$s. Processed frames: %5$d</string>
+    <string name="sync_overlay_hint">◀ audio earlier · audio later ▶ (hold to go faster) · OK to close</string>
 </resources>
