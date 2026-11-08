@@ -156,7 +156,7 @@ public class PlayerActivity extends Activity {
     public static final int CONTROLLER_TIMEOUT = 3500;
 
     private final Runnable startControllerHider = () -> {
-        if (playerView != null && player != null && player.isPlaying() && !isScrubbing) {
+        if (playerView != null && player != null && player.isPlaying() && !this.isScrubbing) {
             playerView.hideController();
         }
     };
