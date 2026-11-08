@@ -12,8 +12,10 @@ android {
         applicationId "com.bersoage.justanotherplayer"
         minSdkVersion 24
         targetSdkVersion 36
-        versionCode 219
-        versionName "0.${versionCode}"
+        // CI passes BETA_NUMBER (the build counter), so every beta says which one it is.
+        def betaNumber = (System.getenv('BETA_NUMBER') ?: '0') as int
+        versionCode 219 + betaNumber
+        versionName betaNumber > 0 ? "beta ${betaNumber}" : "0.${versionCode}"
         if (abiFilter) {
             def abiCodeMap = ["x86": 1, "x86_64": 2, "armeabi-v7a": 3, "arm64-v8a": 4]
             versionCode = versionCode * 10 + abiCodeMap[abiFilter]

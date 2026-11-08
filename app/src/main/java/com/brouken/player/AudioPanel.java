@@ -77,6 +77,7 @@ final class AudioPanel {
         RadioButton hdrDv = v.findViewById(R.id.video_hdr_dv);
         RadioButton hdr10 = v.findViewById(R.id.video_hdr_10);
         TextView diag = v.findViewById(R.id.audio_diag);
+        ((TextView) v.findViewById(R.id.audio_version)).setText(versionText(context));
 
         gain.setMax(AudioAdjustProcessor.MAX_GAIN_DB);
         gain.setKeyProgressIncrement(1);
@@ -198,6 +199,15 @@ final class AudioPanel {
             w.setBackgroundDrawable(new ColorDrawable(0xE6181818));
             w.setLayout(width, WindowManager.LayoutParams.MATCH_PARENT);
         }
+    }
+
+    private static String versionText(Context context) {
+        String version = "?";
+        try {
+            version = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (Exception ignored) {
+        }
+        return "JustAnotherPlayer " + version;
     }
 
     private static String diagText(Context context) {

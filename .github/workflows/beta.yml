@@ -24,6 +24,8 @@ jobs:
           cache: gradle
 
       - name: Build APK
+        env:
+          BETA_NUMBER: ${{ github.run_number }}
         run: |
           chmod +x gradlew
           ./gradlew assembleLatestUniversalDebug --stacktrace
@@ -31,25 +33,23 @@ jobs:
       - name: Collect APK
         run: |
           mkdir -p out
-          cp app/build/outputs/apk/latestUniversal/debug/*.apk out/JustAnotherPlayer-beta.apk
+          cp app/build/outputs/apk/latestUniversal/debug/*.apk out/JustAnotherPlayer-beta${{ github.run_number }}.apk
           ls -la out
 
       - uses: actions/upload-artifact@v4
         with:
-          name: JustAnotherPlayer-beta
-          path: out/JustAnotherPlayer-beta.apk
+          name: JustAnotherPlayer-beta${{ github.run_number }}
+          path: out/JustAnotherPlayer-beta${{ github.run_number }}.apk
 
-      - name: Publish to the "beta" release (fixed download link)
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: beta
-          name: JustAnotherPlayer beta
-          prerelease: true
-          make_latest: false
-          body: |
-            Beta build from commit ${{ github.sha }}.
-            Download JustAnotherPlayer-beta.apk below and install it on the TV.
-          files: out/JustAnotherPlayer-beta.apk
+      - name: Publish to the "beta" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view beta >/dev/null 2>&1 || gh release create beta --prerelease --title "JustAnotherPlayer beta" --notes "Latest beta build. Download the .apk below and install it on the TV."
+          for a in $(gh release view beta --json assets --jq '.assets[].name'); do
+            gh release delete-asset beta "$a" -y
+          done
+          gh release upload beta out/JustAnotherPlayer-beta${{ github.run_number }}.apk
 
       - name: Move the "beta" tag to this commit
         run: |
