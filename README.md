@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/logos/logo-a-icono-dos-lineas-fondo-oscuro.png" alt="JustAnotherPlayer" width="560"></p>
+
 # JustAnotherPlayer
 
 **El reproductor de video para Android TV con panel de sonido propio: potenciador, balance por Bluetooth, voces, graves, agudos, eco, sincronía de audio y elección entre Dolby Vision y HDR10.**
