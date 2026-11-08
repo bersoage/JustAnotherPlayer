@@ -154,6 +154,12 @@ public class PlayerActivity extends Activity {
     private static final int REQUEST_SETTINGS = 100;
     private static final int REQUEST_SYSTEM_CAPTIONS = 200;
     public static final int CONTROLLER_TIMEOUT = 3500;
+
+    private final Runnable startControllerHider = () -> {
+        if (playerView != null && player != null && player.isPlaying() && !isScrubbing) {
+            playerView.hideController();
+        }
+    };
     private static final String ACTION_MEDIA_CONTROL = "media_control";
     private static final String EXTRA_CONTROL_TYPE = "control_type";
     private static final int REQUEST_PLAY = 1;
@@ -1655,6 +1661,11 @@ public class PlayerActivity extends Activity {
 
                 if (videoLoading) {
                     videoLoading = false;
+
+                    // Show the control bar for 3 seconds every time a video starts.
+                    playerView.showController();
+                    playerView.removeCallbacks(startControllerHider);
+                    playerView.postDelayed(startControllerHider, 3000);
 
                     if (mPrefs.orientation == Utils.Orientation.UNSPECIFIED) {
                         mPrefs.orientation = Utils.getNextOrientation(mPrefs.orientation);
