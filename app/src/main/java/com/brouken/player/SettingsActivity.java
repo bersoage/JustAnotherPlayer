@@ -38,13 +38,8 @@ public class SettingsActivity extends AppCompatActivity {
             getWindow().setNavigationBarColor(Color.TRANSPARENT);
 
             if (Build.VERSION.SDK_INT >= 35) {
-                int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-
-                if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
-                    getWindow().getDecorView().setSystemUiVisibility(0);
-                } else if (nightModeFlags == Configuration.UI_MODE_NIGHT_NO) {
-                    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-                }
+                // The settings screen is always dark now, so the status bar icons stay light.
+                getWindow().getDecorView().setSystemUiVisibility(0);
             }
         }
 
