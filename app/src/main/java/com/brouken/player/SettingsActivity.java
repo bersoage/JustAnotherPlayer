@@ -83,6 +83,15 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
+            Preference preferenceAbout = findPreference("about_app");
+            if (preferenceAbout != null) {
+                try {
+                    preferenceAbout.setSummary(requireContext().getPackageManager()
+                            .getPackageInfo(requireContext().getPackageName(), 0).versionName);
+                } catch (Exception ignored) {
+                }
+            }
+
             Preference preferenceAutoPiP = findPreference("autoPiP");
             if (preferenceAutoPiP != null) {
                 preferenceAutoPiP.setEnabled(Utils.isPiPSupported(this.getContext()));

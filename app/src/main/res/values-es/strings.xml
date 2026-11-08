@@ -76,4 +76,7 @@
     <string name="audio_diag_idle">Diagnóstico: el audio todavía no pasa por el procesador. Reproducí un video.</string>
     <string name="audio_diag_active">Diagnóstico: entrada %1$d canales → salida %2$d canales, %3$d Hz, %4$s. Cuadros procesados: %5$d</string>
     <string name="sync_overlay_hint">◀ el audio se adelanta · el audio se atrasa ▶ (mantené apretado para ir más rápido) · OK para cerrar</string>
+    <string name="pref_about_header">Acerca de</string>
+    <string name="pref_about_based_on">Basado en Just (Video) Player</string>
+    <string name="pref_about_based_on_summary">De Marcel Dopita (moneytoo)</string>
 </resources>

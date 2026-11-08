@@ -23,6 +23,8 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Animatable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.hardware.display.DisplayManager;
 import android.media.AudioManager;
@@ -621,7 +623,7 @@ public class PlayerActivity extends Activity {
 
         buttonAudio = new ImageButton(this, null, 0, R.style.ExoStyledControls_Button_Bottom);
         buttonAudio.setId(View.generateViewId());
-        buttonAudio.setImageResource(R.drawable.ic_volume_up_24dp);
+        buttonAudio.setImageResource(R.drawable.ic_sound_anim);
         buttonAudio.setContentDescription(getString(R.string.button_audio));
         buttonAudio.setOnClickListener(view -> AudioPanel.show(this, this::restartPlayer, this::showSyncOverlay));
 
@@ -964,6 +966,21 @@ public class PlayerActivity extends Activity {
         return super.onKeyUp(keyCode, event);
     }
 
+    /** The equalizer bars of the sound button move only while the video is playing. */
+    private void updateSoundIconAnimation(boolean playing) {
+        if (buttonAudio == null) {
+            return;
+        }
+        final Drawable icon = buttonAudio.getDrawable();
+        if (icon instanceof Animatable) {
+            if (playing) {
+                ((Animatable) icon).start();
+            } else {
+                ((Animatable) icon).stop();
+            }
+        }
+    }
+
     private View syncOverlay;
     private TextView syncOverlayValue;
     private final Runnable syncOverlayHider = this::hideSyncOverlay;
@@ -1001,7 +1018,8 @@ public class PlayerActivity extends Activity {
 
     private void scheduleSyncOverlayHide() {
         playerView.removeCallbacks(syncOverlayHider);
-        playerView.postDelayed(syncOverlayHider, 8000);
+        // A full minute, so there is time to compare lips and sound; every adjustment restarts it.
+        playerView.postDelayed(syncOverlayHider, 60000);
     }
 
     private void updateSyncOverlay() {
@@ -1590,6 +1608,7 @@ public class PlayerActivity extends Activity {
         @Override
         public void onIsPlayingChanged(boolean isPlaying) {
             playerView.setKeepScreenOn(isPlaying);
+            updateSoundIconAnimation(isPlaying);
 
             if (Utils.isPiPSupported(PlayerActivity.this)) {
                 if (isPlaying) {

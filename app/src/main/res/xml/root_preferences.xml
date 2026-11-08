@@ -98,4 +98,19 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/pref_about_header">
+
+        <Preference
+            app:key="about_app"
+            app:title="@string/pref_about_app" />
+
+        <Preference
+            app:title="@string/pref_about_signature" />
+
+        <Preference
+            app:title="@string/pref_about_based_on"
+            app:summary="@string/pref_about_based_on_summary" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_sound_vd">
+    <target android:name="bar1" android:animation="@animator/eq_bar1" />
+    <target android:name="bar2" android:animation="@animator/eq_bar2" />
+    <target android:name="bar3" android:animation="@animator/eq_bar3" />
+    <target android:name="bar4" android:animation="@animator/eq_bar4" />
+    <target android:name="bar5" android:animation="@animator/eq_bar5" />
+</animated-vector>

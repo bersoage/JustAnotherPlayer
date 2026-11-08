@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <group android:name="bar1" android:pivotX="9" android:pivotY="40" android:scaleY="0.55">
+        <path android:fillColor="#FFFFFF" android:pathData="M6,11a3,3 0 0 1 6,0v26a3,3 0 0 1 -6,0z" />
+    </group>
+    <group android:name="bar2" android:pivotX="17" android:pivotY="40" android:scaleY="0.9">
+        <path android:fillColor="#FFFFFF" android:pathData="M14,11a3,3 0 0 1 6,0v26a3,3 0 0 1 -6,0z" />
+    </group>
+    <group android:name="bar3" android:pivotX="25" android:pivotY="40" android:scaleY="1.0">
+        <path android:fillColor="#E53935" android:pathData="M22,11a3,3 0 0 1 6,0v26a3,3 0 0 1 -6,0z" />
+    </group>
+    <group android:name="bar4" android:pivotX="33" android:pivotY="40" android:scaleY="0.7">
+        <path android:fillColor="#FFFFFF" android:pathData="M30,11a3,3 0 0 1 6,0v26a3,3 0 0 1 -6,0z" />
+    </group>
+    <group android:name="bar5" android:pivotX="41" android:pivotY="40" android:scaleY="0.45">
+        <path android:fillColor="#FFFFFF" android:pathData="M38,11a3,3 0 0 1 6,0v26a3,3 0 0 1 -6,0z" />
+    </group>
+</vector>

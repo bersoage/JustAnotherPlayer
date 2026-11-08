@@ -77,4 +77,9 @@
     <string name="audio_diag_idle">Diagnostics: audio is not going through the processor yet. Play a video.</string>
     <string name="audio_diag_active">Diagnostics: input %1$d ch → output %2$d ch, %3$d Hz, %4$s. Processed frames: %5$d</string>
     <string name="sync_overlay_hint">◀ audio earlier · audio later ▶ (hold to go faster) · OK to close</string>
+    <string name="pref_about_header">About</string>
+    <string name="pref_about_app" translatable="false">JustAnotherPlayer</string>
+    <string name="pref_about_signature" translatable="false">@Sr.BernS - Bernardo Soage - Corrientes Argentina</string>
+    <string name="pref_about_based_on">Based on Just (Video) Player</string>
+    <string name="pref_about_based_on_summary">By Marcel Dopita (moneytoo)</string>
 </resources>
