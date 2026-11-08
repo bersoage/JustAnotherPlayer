@@ -3,6 +3,9 @@ name: Build beta APK
 on:
   push:
     branches: [main, master, justanotherplayer]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
   workflow_dispatch:
 
 permissions:
