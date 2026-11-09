@@ -656,38 +656,85 @@ class Utils {
 
     public static Uri convertInputStreamToUTF(Context context, Uri subtitleUri, InputStream inputStream) {
         try {
-            DecodedInputStreamReader decodedInputStreamReader = Chardet.decode(inputStream, StandardCharsets.UTF_8);
-            Charset charset = decodedInputStreamReader.charset();
-            if (!StandardCharsets.UTF_8.equals(charset)) {
-                String filename = subtitleUri.getPath();
-                filename = filename.substring(filename.lastIndexOf("/") + 1);
-                final File file = new File(context.getCacheDir(), filename);
-                final BufferedReader bufferedReader = new BufferedReader(decodedInputStreamReader);
-                final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
-                char[] buffer = new char[512];
-                int num;
-                int pass = 0;
-                boolean success = true;
-                while ((num = bufferedReader.read(buffer)) != -1) {
-                    bufferedWriter.write(buffer, 0, num);
-                    pass++;
-                    if (pass * 512 > 2_000_000) {
-                        success = false;
-                        break;
-                    }
-                }
-                bufferedWriter.close();
-                bufferedReader.close();
-                if (success) {
-                    subtitleUri = Uri.fromFile(file);
-                } else {
-                    subtitleUri = null;
+            final java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
+            final byte[] buf = new byte[8192];
+            int n;
+            boolean tooBig = false;
+            while ((n = inputStream.read(buf)) != -1) {
+                bytes.write(buf, 0, n);
+                if (bytes.size() > 2_000_000) {
+                    tooBig = true;
+                    break;
                 }
             }
-        } catch (IOException e) {
+            inputStream.close();
+            if (tooBig) {
+                return subtitleUri;
+            }
+            final byte[] data = bytes.toByteArray();
+            final String mode = android.preference.PreferenceManager
+                    .getDefaultSharedPreferences(context).getString("subtitleEncoding", "auto");
+            final Charset charset = pickSubtitleCharset(data, mode);
+            if (charset == null) {
+                return subtitleUri; // already UTF-8 (or plain ASCII)
+            }
+            String filename = subtitleUri.getPath();
+            filename = filename.substring(filename.lastIndexOf("/") + 1);
+            final File file = new File(context.getCacheDir(), filename);
+            final java.io.FileOutputStream out = new java.io.FileOutputStream(file);
+            out.write(new String(data, charset).getBytes(StandardCharsets.UTF_8));
+            out.close();
+            return Uri.fromFile(file);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return subtitleUri;
+    }
+
+    /**
+     * Returns the charset the subtitle bytes must be decoded with, or null when the data can be
+     * used as is (UTF-8). Spanish ANSI files (Windows-1252) are often misdetected, so when the
+     * file is not valid UTF-8 and the detector answers a Latin-like charset (or nothing), use
+     * Windows-1252.
+     */
+    private static Charset pickSubtitleCharset(byte[] data, String mode) {
+        final Charset ansi = Charset.forName("windows-1252");
+        if ("utf8".equals(mode)) {
+            return null;
+        }
+        if ("ansi".equals(mode)) {
+            return ansi;
+        }
+        if (data.length >= 3 && (data[0] & 0xFF) == 0xEF && (data[1] & 0xFF) == 0xBB && (data[2] & 0xFF) == 0xBF) {
+            return null; // UTF-8 with BOM
+        }
+        if (data.length >= 2 && (((data[0] & 0xFF) == 0xFF && (data[1] & 0xFF) == 0xFE)
+                || ((data[0] & 0xFF) == 0xFE && (data[1] & 0xFF) == 0xFF))) {
+            return Charset.forName("UTF-16"); // BOM is honored by this decoder
+        }
+        try {
+            StandardCharsets.UTF_8.newDecoder()
+                    .onMalformedInput(java.nio.charset.CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT)
+                    .decode(java.nio.ByteBuffer.wrap(data));
+            return null; // valid UTF-8
+        } catch (java.nio.charset.CharacterCodingException ignored) {
+        }
+        try {
+            Charset detected = Chardet.decode(new java.io.ByteArrayInputStream(data), ansi).charset();
+            if (detected == null) {
+                return ansi;
+            }
+            final String name = detected.name().toLowerCase(java.util.Locale.ROOT);
+            final boolean latinLike = name.equals("iso-8859-1") || name.equals("iso-8859-2")
+                    || name.equals("iso-8859-15") || name.equals("windows-1250")
+                    || name.equals("windows-1252") || name.equals("us-ascii")
+                    || name.equals("x-maccroman") || name.equals("ibm850")
+                    || name.equals("ibm437") || name.equals("utf-8");
+            return latinLike ? ansi : detected;
+        } catch (Exception e) {
+            return ansi;
+        }
     }
 
     public static boolean isPiPSupported(Context context) {

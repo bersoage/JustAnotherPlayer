@@ -90,4 +90,6 @@
     <string name="effects_echo_off">Off</string>
     <string name="effects_reset">Reset effects</string>
     <string name="effects_back">Back to sound</string>
+    <string name="pref_subtitle_encoding">Subtitle encoding</string>
+    <string name="pref_subtitle_encoding_auto">Automatic (ANSI if unsure)</string>
 </resources>

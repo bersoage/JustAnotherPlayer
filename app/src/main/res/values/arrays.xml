@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string-array name="subtitle_encoding_entries">
+    <item>@string/pref_subtitle_encoding_auto</item>
+    <item>UTF-8</item>
+    <item>ANSI (Windows-1252)</item>
+  </string-array>
+
+  <string-array name="subtitle_encoding_values">
+    <item>auto</item>
+    <item>utf8</item>
+    <item>ansi</item>
+  </string-array>
+
   <string-array name="file_access_entries">
     <item>@string/pref_file_access_auto</item>
     <item>Storage Access Framework</item>

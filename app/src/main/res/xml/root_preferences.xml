@@ -17,6 +17,14 @@
             app:title="@string/pref_language_audio"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            app:key="subtitleEncoding"
+            android:defaultValue="auto"
+            app:title="@string/pref_subtitle_encoding"
+            app:entries="@array/subtitle_encoding_entries"
+            app:entryValues="@array/subtitle_encoding_values"
+            app:useSimpleSummaryProvider="true" />
+
         <SwitchPreferenceCompat
             app:key="frameRateMatching"
             app:defaultValue="false"
