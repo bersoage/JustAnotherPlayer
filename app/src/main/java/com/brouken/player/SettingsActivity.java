@@ -87,6 +87,14 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             }
 
+            Preference preferenceUpdate = findPreference("check_update");
+            if (preferenceUpdate != null) {
+                preferenceUpdate.setOnPreferenceClickListener(pref -> {
+                    UpdateChecker.check(requireActivity(), true);
+                    return true;
+                });
+            }
+
             Preference preferenceAutoPiP = findPreference("autoPiP");
             if (preferenceAutoPiP != null) {
                 preferenceAutoPiP.setEnabled(Utils.isPiPSupported(this.getContext()));
