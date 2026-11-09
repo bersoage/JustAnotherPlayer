@@ -74,6 +74,7 @@ final class AudioPanel {
                 .putInt(KEY_ECHO_DELAY, AudioAdjustProcessor.echoDelayMs)
                 .putBoolean(KEY_ECHO_PING, AudioAdjustProcessor.echoPingPong)
                 .apply();
+        VideoMemory.saveAdjust(context);
     }
 
     /**
@@ -81,7 +82,7 @@ final class AudioPanel {
      *                         must be rebuilt for the new decoder choice to apply.
      * @param onOpenSync       called after the panel closes, to show the floating sync strip.
      */
-    static void show(Context context, Runnable onHdrModeChanged, Runnable onOpenSync) {
+    static void show(Context context, Runnable onHdrModeChanged, Runnable onOpenSync, Runnable onOpenSubSync) {
         View v = LayoutInflater.from(context).inflate(R.layout.dialog_audio, null);
 
         SeekBar gain = v.findViewById(R.id.audio_gain);
@@ -94,6 +95,7 @@ final class AudioPanel {
         Button syncOpen = v.findViewById(R.id.audio_sync_open);
         Button reset = v.findViewById(R.id.audio_reset);
         Button effectsOpen = v.findViewById(R.id.audio_effects_open);
+        Button subSyncOpen = v.findViewById(R.id.audio_subsync_open);
         RadioGroup hdrGroup = v.findViewById(R.id.video_hdr_mode);
         RadioButton hdrDv = v.findViewById(R.id.video_hdr_dv);
         RadioButton hdr10 = v.findViewById(R.id.video_hdr_10);
@@ -194,9 +196,14 @@ final class AudioPanel {
             if (onOpenSync != null) onOpenSync.run();
         });
 
+        subSyncOpen.setOnClickListener(view -> {
+            dialog.dismiss();
+            if (onOpenSubSync != null) onOpenSubSync.run();
+        });
+
         effectsOpen.setOnClickListener(view -> {
             dialog.dismiss();
-            EffectsPanel.show(context, () -> show(context, onHdrModeChanged, onOpenSync));
+            EffectsPanel.show(context, () -> show(context, onHdrModeChanged, onOpenSync, onOpenSubSync));
         });
 
         // Diagnostics, refreshed while the panel is open.
@@ -250,8 +257,16 @@ final class AudioPanel {
     }
 
     private static String diagText(Context context) {
+        String buffer = "";
+        try {
+            if (PlayerActivity.player != null) {
+                buffer = "\n" + context.getString(R.string.audio_diag_buffer,
+                        (int) (PlayerActivity.player.getTotalBufferedDuration() / 1000));
+            }
+        } catch (Exception ignored) {
+        }
         if (!AudioAdjustProcessor.diagConfigured) {
-            return context.getString(R.string.audio_diag_idle);
+            return context.getString(R.string.audio_diag_idle) + buffer;
         }
         String enc = AudioAdjustProcessor.diagEncoding == C.ENCODING_PCM_FLOAT ? "PCM float" : "PCM 16";
         return context.getString(R.string.audio_diag_active,
@@ -259,7 +274,7 @@ final class AudioPanel {
                 AudioAdjustProcessor.diagOutChannels,
                 AudioAdjustProcessor.diagSampleRate,
                 enc,
-                AudioAdjustProcessor.diagFrames);
+                AudioAdjustProcessor.diagFrames) + buffer;
     }
 
     private abstract static class SimpleSeekBarListener implements SeekBar.OnSeekBarChangeListener {

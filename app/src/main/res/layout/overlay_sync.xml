@@ -12,6 +12,13 @@
     android:paddingBottom="8dp">
 
   <TextView
+      android:id="@+id/sync_title"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textColor="#E53935"
+      android:textSize="13sp" />
+
+  <TextView
       android:id="@+id/sync_value"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
@@ -19,6 +26,7 @@
       android:textSize="26sp" />
 
   <TextView
+      android:id="@+id/sync_hint"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="@string/sync_overlay_hint"

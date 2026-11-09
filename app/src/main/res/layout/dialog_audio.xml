@@ -136,6 +136,15 @@
         android:textSize="14sp" />
 
     <Button
+        android:id="@+id/audio_subsync_open"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:minHeight="44dp"
+        android:text="@string/audio_subsync_open"
+        android:textSize="14sp" />
+
+    <Button
         android:id="@+id/audio_effects_open"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

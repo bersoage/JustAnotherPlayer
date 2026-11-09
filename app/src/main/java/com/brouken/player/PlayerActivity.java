@@ -257,6 +257,13 @@ public class PlayerActivity extends Activity {
 
         isTvBox = Utils.isTvBox(this);
 
+        // Look for a newer beta a few seconds after opening (silent when there is nothing new).
+        getWindow().getDecorView().postDelayed(() -> {
+            if (!isFinishing()) {
+                UpdateChecker.checkAuto(this);
+            }
+        }, 4000);
+
         if (isTvBox) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
@@ -631,7 +638,7 @@ public class PlayerActivity extends Activity {
         buttonAudio.setId(View.generateViewId());
         buttonAudio.setImageResource(R.drawable.ic_sound_anim);
         buttonAudio.setContentDescription(getString(R.string.button_audio));
-        buttonAudio.setOnClickListener(view -> AudioPanel.show(this, this::restartPlayer, this::showSyncOverlay));
+        buttonAudio.setOnClickListener(view -> AudioPanel.show(this, this::restartPlayer, this::showSyncOverlay, this::showSubSyncOverlay));
 
         final HorizontalScrollView horizontalScrollView = (HorizontalScrollView) getLayoutInflater().inflate(R.layout.controls, null);
         final LinearLayout controls = horizontalScrollView.findViewById(R.id.controls);
@@ -989,16 +996,35 @@ public class PlayerActivity extends Activity {
 
     private View syncOverlay;
     private TextView syncOverlayValue;
+    private int syncMode = 0; // 0 = audio, 1 = subtitles
     private final Runnable syncOverlayHider = this::hideSyncOverlay;
 
     /** Floating strip over the video to adjust audio/video sync while watching lips. */
     void showSyncOverlay() {
+        openSyncOverlay(0);
+    }
+
+    /** Same strip, for subtitles. The first use rebuilds the player once to hook the text renderer. */
+    void showSubSyncOverlay() {
+        if (!SubtitleShift.enabled) {
+            SubtitleShift.enabled = true;
+            restartPlayer();
+        }
+        openSyncOverlay(1);
+    }
+
+    private void openSyncOverlay(int mode) {
         if (syncOverlay != null) {
             return;
         }
+        syncMode = mode;
         final ViewGroup root = findViewById(R.id.coordinatorLayout);
         syncOverlay = getLayoutInflater().inflate(R.layout.overlay_sync, root, false);
         syncOverlayValue = syncOverlay.findViewById(R.id.sync_value);
+        ((TextView) syncOverlay.findViewById(R.id.sync_title)).setText(
+                mode == 1 ? R.string.sync_overlay_title_sub : R.string.sync_overlay_title_audio);
+        ((TextView) syncOverlay.findViewById(R.id.sync_hint)).setText(
+                mode == 1 ? R.string.sync_overlay_hint_sub : R.string.sync_overlay_hint);
         syncOverlay.setOnClickListener(v -> hideSyncOverlay());
 
         final CoordinatorLayout.LayoutParams lp = new CoordinatorLayout.LayoutParams(
@@ -1032,7 +1058,7 @@ public class PlayerActivity extends Activity {
         if (syncOverlayValue == null) {
             return;
         }
-        final int d = AudioAdjustProcessor.delayMs;
+        final int d = syncMode == 1 ? AudioAdjustProcessor.subDelayMs : AudioAdjustProcessor.delayMs;
         syncOverlayValue.setText((d > 0 ? "+" : "") + d + " ms");
     }
 
@@ -1046,11 +1072,18 @@ public class PlayerActivity extends Activity {
                 if (down) {
                     // One press = 50 ms. Holding the key speeds up so 3000 ms is reachable.
                     final int repeat = event.getRepeatCount();
-                    final int step = repeat < 8 ? 50 : (repeat < 20 ? 100 : 250);
                     final int dir = keyCode == KeyEvent.KEYCODE_DPAD_RIGHT ? 1 : -1;
-                    AudioAdjustProcessor.delayMs = Math.max(-AudioAdjustProcessor.MAX_DELAY_MS,
-                            Math.min(AudioAdjustProcessor.MAX_DELAY_MS, AudioAdjustProcessor.delayMs + dir * step));
-                    AudioPanel.persist(this);
+                    if (syncMode == 1) {
+                        final int step = repeat < 8 ? 100 : (repeat < 20 ? 250 : 500);
+                        AudioAdjustProcessor.subDelayMs = Math.max(-AudioAdjustProcessor.MAX_SUB_DELAY_MS,
+                                Math.min(AudioAdjustProcessor.MAX_SUB_DELAY_MS, AudioAdjustProcessor.subDelayMs + dir * step));
+                        VideoMemory.saveAdjust(this);
+                    } else {
+                        final int step = repeat < 8 ? 50 : (repeat < 20 ? 100 : 250);
+                        AudioAdjustProcessor.delayMs = Math.max(-AudioAdjustProcessor.MAX_DELAY_MS,
+                                Math.min(AudioAdjustProcessor.MAX_DELAY_MS, AudioAdjustProcessor.delayMs + dir * step));
+                        AudioPanel.persist(this);
+                    }
                     updateSyncOverlay();
                     scheduleSyncOverlayHide();
                 }
@@ -1350,6 +1383,9 @@ public class PlayerActivity extends Activity {
                 .setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ENABLE_HDMV_DTS_AUDIO_STREAMS)
                 .setTsExtractorTimestampSearchBytes(1500 * TsExtractor.TS_PACKET_SIZE);
         AudioPanel.load(this);
+        if (haveMedia) {
+            VideoMemory.apply(this, mPrefs);
+        }
         HdrModeCodecSelector.load(this);
         // In HDR10 mode the Dolby Vision decoders are hidden, so profile 7 files need to be
         // mapped to HEVC too; otherwise they have no decoder at all and the picture flickers.
@@ -1363,6 +1399,26 @@ public class PlayerActivity extends Activity {
                         .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
                         .setAudioProcessors(new AudioProcessor[]{new AudioAdjustProcessor()})
                         .build());
+            }
+
+            @Override
+            public androidx.media3.exoplayer.Renderer[] createRenderers(
+                    android.os.Handler eventHandler,
+                    androidx.media3.exoplayer.video.VideoRendererEventListener videoRendererEventListener,
+                    androidx.media3.exoplayer.audio.AudioRendererEventListener audioRendererEventListener,
+                    androidx.media3.exoplayer.text.TextOutput textRendererOutput,
+                    androidx.media3.exoplayer.metadata.MetadataOutput metadataRendererOutput) {
+                final androidx.media3.exoplayer.Renderer[] renderers = super.createRenderers(eventHandler,
+                        videoRendererEventListener, audioRendererEventListener, textRendererOutput,
+                        metadataRendererOutput);
+                if (SubtitleShift.enabled) {
+                    for (int i = 0; i < renderers.length; i++) {
+                        if (renderers[i] instanceof androidx.media3.exoplayer.text.TextRenderer) {
+                            renderers[i] = SubtitleShift.wrap(renderers[i]);
+                        }
+                    }
+                }
+                return renderers;
             }
         }.setExtensionRendererMode(mPrefs.decoderPriority)
                 .setMediaCodecSelector(new HdrModeCodecSelector());
@@ -1382,6 +1438,11 @@ public class PlayerActivity extends Activity {
                     playerBuilder.setMediaSourceFactory(new DefaultMediaSourceFactory(defaultHttpDataSourceFactory, extractorsFactory));
                 }
             }
+        }
+
+        final androidx.media3.exoplayer.LoadControl loadControl = BufferSettings.build(this);
+        if (loadControl != null) {
+            playerBuilder.setLoadControl(loadControl);
         }
 
         player = playerBuilder.build();
@@ -1532,6 +1593,7 @@ public class PlayerActivity extends Activity {
                         playerView.getResizeMode(),
                         playerView.getVideoSurfaceView().getScaleX(),
                         player.getPlaybackParameters().speed);
+                VideoMemory.save(this, mPrefs);
             }
         }
     }

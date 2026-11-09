@@ -92,4 +92,21 @@
     <string name="effects_echo_delay">Tiempo del eco</string>
     <string name="effects_echo_mode_normal">Modo del eco: Normal</string>
     <string name="effects_echo_mode_pingpong">Modo del eco: Rebote (uno y uno)</string>
+    <string name="pref_buffer">Búfer de red</string>
+    <string name="pref_buffer_normal">Normal</string>
+    <string name="pref_buffer_large">Grande (hasta 2 min)</string>
+    <string name="pref_buffer_max">Máximo (hasta 5 min)</string>
+    <string name="audio_diag_buffer">Búfer: %1$d s</string>
+    <string name="pref_check_update">Buscar actualización</string>
+    <string name="update_available">Hay una versión nueva: %1$s (tenés %2$s). ¿Actualizar ahora?</string>
+    <string name="update_now">Actualizar</string>
+    <string name="update_later">Más tarde</string>
+    <string name="update_downloading">Descargando… %1$d %%</string>
+    <string name="update_latest">Ya tenés la última versión (%1$s)</string>
+    <string name="update_error">No se pudo buscar o bajar la actualización</string>
+    <string name="update_allow">Permití instalar apps desde JustAnotherPlayer, volvé y tocá Actualizar otra vez</string>
+    <string name="audio_subsync_open">Ajustar sincronía de subtítulos sobre el video</string>
+    <string name="sync_overlay_title_audio">Sincronía de audio</string>
+    <string name="sync_overlay_title_sub">Sincronía de subtítulos</string>
+    <string name="sync_overlay_hint_sub">◀ subtítulos antes · después ▶ (mantené apretado para correr rápido) · OK cierra</string>
 </resources>

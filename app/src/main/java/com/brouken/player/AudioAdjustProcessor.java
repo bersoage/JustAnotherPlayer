@@ -44,6 +44,9 @@ public final class AudioAdjustProcessor extends BaseAudioProcessor {
      * Positive: audio is heard later. Negative: audio is heard earlier.
      */
     public static volatile int delayMs = 0;
+    /** Subtitle offset in ms, -MAX_SUB_DELAY_MS..MAX_SUB_DELAY_MS. Positive: subtitles appear later. */
+    public static final int MAX_SUB_DELAY_MS = 10000;
+    public static volatile int subDelayMs = 0;
 
     // Diagnostics shown in the sound panel.
     public static volatile boolean diagConfigured = false;
