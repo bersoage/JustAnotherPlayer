@@ -36,6 +36,15 @@
       <TextView android:id="@+id/exo_duration"
           style="@style/ExoStyledControls.TimeText.Duration"/>
 
+      <TextView android:id="@+id/buffer_indicator"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="18dp"
+          android:layout_gravity="center_vertical"
+          android:textColor="#FFFFFF"
+          android:textSize="15sp"
+          android:visibility="gone" />
+
     </LinearLayout>
 
     <LinearLayout android:id="@+id/exo_basic_controls"
@@ -89,11 +98,11 @@
 
   <com.brouken.player.CustomDefaultTimeBar android:id="@+id/exo_progress"
       android:layout_width="match_parent"
-      android:layout_height="@dimen/exo_styled_progress_layout_height"
+      android:layout_height="56dp"
       android:layout_gravity="bottom"
       android:layout_marginBottom="@dimen/exo_styled_progress_margin_bottom"
       app:bar_height="@dimen/exo_styled_progress_bar_height"
-      app:bar_gravity="bottom"
+      app:bar_gravity="center"
       app:touch_target_height="@dimen/exo_styled_progress_touch_target_height"
       app:scrubber_enabled_size="@dimen/exo_styled_progress_enabled_thumb_size"
       app:scrubber_dragged_size="@dimen/exo_styled_progress_dragged_thumb_size"

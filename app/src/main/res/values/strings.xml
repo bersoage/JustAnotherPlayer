@@ -112,4 +112,6 @@
     <string name="sync_overlay_title_audio">Audio sync</string>
     <string name="sync_overlay_title_sub">Subtitle sync</string>
     <string name="sync_overlay_hint_sub">◀ subtitles earlier · later ▶ (hold to go faster) · OK to close</string>
+    <string name="buffer_indicator_seconds">⬇ %1$d s</string>
+    <string name="buffer_indicator_loading">loading… %1$d s</string>
 </resources>

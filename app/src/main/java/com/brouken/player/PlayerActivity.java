@@ -1446,6 +1446,7 @@ public class PlayerActivity extends Activity {
         }
 
         player = playerBuilder.build();
+        startBufferIndicator();
 
         AudioAttributes audioAttributes = new AudioAttributes.Builder()
                 .setUsage(C.USAGE_MEDIA)
@@ -1628,6 +1629,47 @@ public class PlayerActivity extends Activity {
     }
 
     /** Rebuilds the player keeping the current position, e.g. after changing HDR mode. */
+    private final Runnable bufferTicker = new Runnable() {
+        @Override
+        public void run() {
+            updateBufferIndicator();
+            if (player != null) {
+                playerView.postDelayed(this, 1000);
+            }
+        }
+    };
+
+    private void startBufferIndicator() {
+        playerView.removeCallbacks(bufferTicker);
+        playerView.post(bufferTicker);
+    }
+
+    /** Seconds loaded ahead of the playback position; only for network videos. */
+    private void updateBufferIndicator() {
+        final View indicator = playerView.findViewById(R.id.buffer_indicator);
+        if (!(indicator instanceof TextView)) {
+            return;
+        }
+        final TextView t = (TextView) indicator;
+        final boolean network = haveMedia && mPrefs.mediaUri != null
+                && Utils.isSupportedNetworkUri(mPrefs.mediaUri);
+        if (!network || player == null) {
+            t.setVisibility(View.GONE);
+            return;
+        }
+        final long sec = player.getTotalBufferedDuration() / 1000;
+        final boolean waiting = player.getPlaybackState() == Player.STATE_BUFFERING;
+        t.setVisibility(View.VISIBLE);
+        t.setText(getString(waiting ? R.string.buffer_indicator_loading : R.string.buffer_indicator_seconds, (int) sec));
+        if (waiting || sec < 3) {
+            t.setTextColor(0xFFE53935); // about to stall
+        } else if (sec < 10) {
+            t.setTextColor(0xFFFFB300);
+        } else {
+            t.setTextColor(0xFFFFFFFF);
+        }
+    }
+
     void restartPlayer() {
         if (player == null) {
             return;

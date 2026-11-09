@@ -109,4 +109,6 @@
     <string name="sync_overlay_title_audio">Sincronía de audio</string>
     <string name="sync_overlay_title_sub">Sincronía de subtítulos</string>
     <string name="sync_overlay_hint_sub">◀ subtítulos antes · después ▶ (mantené apretado para correr rápido) · OK cierra</string>
+    <string name="buffer_indicator_seconds">⬇ %1$d s</string>
+    <string name="buffer_indicator_loading">cargando… %1$d s</string>
 </resources>
