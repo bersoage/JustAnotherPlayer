@@ -92,4 +92,7 @@
     <string name="effects_back">Back to sound</string>
     <string name="pref_subtitle_encoding">Subtitle encoding</string>
     <string name="pref_subtitle_encoding_auto">Automatic (ANSI if unsure)</string>
+    <string name="effects_echo_delay">Echo time</string>
+    <string name="effects_echo_mode_normal">Echo mode: Normal</string>
+    <string name="effects_echo_mode_pingpong">Echo mode: Bounce (left-right)</string>
 </resources>

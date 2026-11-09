@@ -34,6 +34,11 @@ public final class AudioAdjustProcessor extends BaseAudioProcessor {
     public static final int MAX_FX_DB = 12;
     /** Echo amount, 0..100 (%). 0 = off. */
     public static volatile int echoPct = 0;
+    /** Echo delay in ms (MIN_ECHO_MS..MAX_ECHO_MS) and ping-pong mode (echo alternates L/R). */
+    public static final int MIN_ECHO_MS = 150;
+    public static final int MAX_ECHO_MS = 600;
+    public static volatile int echoDelayMs = 350;
+    public static volatile boolean echoPingPong = false;
     /**
      * Audio/video offset in ms, -MAX_DELAY_MS..MAX_DELAY_MS.
      * Positive: audio is heard later. Negative: audio is heard earlier.
@@ -55,7 +60,7 @@ public final class AudioAdjustProcessor extends BaseAudioProcessor {
 
     private static final float BASS_HZ = 120f;
     private static final float TREBLE_HZ = 6000f;
-    private static final float ECHO_SECONDS = 0.35f;
+    private static final float ECHO_SECONDS = 0.6f; // buffer size = max delay
     private static final float ECHO_FEEDBACK = 0.4f;
     private static final float ECHO_MAX_MIX = 0.6f;
 
@@ -137,6 +142,9 @@ public final class AudioAdjustProcessor extends BaseAudioProcessor {
         final boolean useBass = bass != 0;
         final boolean useTreble = treble != 0;
         final float echoMix = echoPct / 100f * ECHO_MAX_MIX;
+        final boolean pingPong = echoPingPong;
+        final int delayFrames = Math.max(1, Math.min(echoFrames - 1,
+                Math.round(Math.max(MIN_ECHO_MS, Math.min(MAX_ECHO_MS, echoDelayMs)) * sampleRate / 1000f)));
         // A little headroom when boosting, so the boosted bands clip less.
         final float headroom = (float) Math.pow(10, -Math.max(0, Math.max(bass, treble)) * 0.25 / 20.0);
 
@@ -195,19 +203,36 @@ public final class AudioAdjustProcessor extends BaseAudioProcessor {
                 if (useTreble) {
                     v = biquad(highC, highZ[c], v);
                 }
-                v *= headroom;
+                x[c] = v * headroom;
+            }
 
-                final int idx = echoPos * outChannels + c;
-                if (echoMix > 0f) {
-                    final float delayed = echoBuf[idx];
-                    echoBuf[idx] = v + ECHO_FEEDBACK * delayed;
-                    v += echoMix * delayed;
+            final int wBase = echoPos * outChannels;
+            final int rBase = ((echoPos - delayFrames + echoFrames) % echoFrames) * outChannels;
+            if (echoMix > 0f) {
+                if (outChannels == 2 && pingPong) {
+                    // Echo bounces: first repeat on the left, second on the right, and so on.
+                    final float d0 = echoBuf[rBase];
+                    final float d1 = echoBuf[rBase + 1];
+                    echoBuf[wBase] = 0.5f * (x[0] + x[1]) + ECHO_FEEDBACK * d1;
+                    echoBuf[wBase + 1] = ECHO_FEEDBACK * d0;
+                    x[0] += echoMix * d0;
+                    x[1] += echoMix * d1;
                 } else {
-                    echoBuf[idx] = 0f;
+                    for (int c = 0; c < outChannels; c++) {
+                        final float delayed = echoBuf[rBase + c];
+                        echoBuf[wBase + c] = x[c] + ECHO_FEEDBACK * delayed;
+                        x[c] += echoMix * delayed;
+                    }
                 }
+            } else {
+                for (int c = 0; c < outChannels; c++) {
+                    echoBuf[wBase + c] = 0f;
+                }
+            }
 
+            for (int c = 0; c < outChannels; c++) {
                 final float g = outChannels == 1 ? gain : (c == 0 ? leftGain : rightGain);
-                writeSample(out, v * g, isFloat);
+                writeSample(out, x[c] * g, isFloat);
             }
             echoPos = (echoPos + 1) % echoFrames;
         }

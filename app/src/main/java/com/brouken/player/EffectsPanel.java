@@ -25,6 +25,9 @@ final class EffectsPanel {
         TextView bassValue = v.findViewById(R.id.fx_bass_value);
         TextView trebleValue = v.findViewById(R.id.fx_treble_value);
         TextView echoValue = v.findViewById(R.id.fx_echo_value);
+        SeekBar delay = v.findViewById(R.id.fx_delay);
+        TextView delayValue = v.findViewById(R.id.fx_delay_value);
+        Button mode = v.findViewById(R.id.fx_mode);
         Button reset = v.findViewById(R.id.fx_reset);
         Button back = v.findViewById(R.id.fx_back);
 
@@ -38,7 +41,16 @@ final class EffectsPanel {
         echo.setKeyProgressIncrement(1);
         echo.setProgress(AudioAdjustProcessor.echoPct / ECHO_STEP);
 
+        // Delay SeekBar: 150..600 ms in steps of 50.
+        delay.setMax((AudioAdjustProcessor.MAX_ECHO_MS - AudioAdjustProcessor.MIN_ECHO_MS) / 50);
+        delay.setKeyProgressIncrement(1);
+        delay.setProgress((AudioAdjustProcessor.echoDelayMs - AudioAdjustProcessor.MIN_ECHO_MS) / 50);
+
         Runnable refresh = () -> {
+            delayValue.setText(AudioAdjustProcessor.echoDelayMs + " ms");
+            mode.setText(AudioAdjustProcessor.echoPingPong
+                    ? R.string.effects_echo_mode_pingpong
+                    : R.string.effects_echo_mode_normal);
             bassValue.setText(db(AudioAdjustProcessor.bassDb));
             trebleValue.setText(db(AudioAdjustProcessor.trebleDb));
             echoValue.setText(AudioAdjustProcessor.echoPct == 0
@@ -75,7 +87,25 @@ final class EffectsPanel {
             }
         });
 
+        delay.setOnSeekBarChangeListener(new Listener() {
+            @Override
+            public void onProgressChanged(SeekBar s, int p, boolean fromUser) {
+                if (!fromUser) return;
+                AudioAdjustProcessor.echoDelayMs = AudioAdjustProcessor.MIN_ECHO_MS + p * 50;
+                AudioPanel.persist(context);
+                refresh.run();
+            }
+        });
+        mode.setOnClickListener(view -> {
+            AudioAdjustProcessor.echoPingPong = !AudioAdjustProcessor.echoPingPong;
+            AudioPanel.persist(context);
+            refresh.run();
+        });
+
         reset.setOnClickListener(view -> {
+            AudioAdjustProcessor.echoDelayMs = 350;
+            AudioAdjustProcessor.echoPingPong = false;
+            delay.setProgress((350 - AudioAdjustProcessor.MIN_ECHO_MS) / 50);
             AudioAdjustProcessor.bassDb = 0;
             AudioAdjustProcessor.trebleDb = 0;
             AudioAdjustProcessor.echoPct = 0;

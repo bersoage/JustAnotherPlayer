@@ -35,6 +35,8 @@ final class AudioPanel {
     static final String KEY_BASS = "bass";
     static final String KEY_TREBLE = "treble";
     static final String KEY_ECHO = "echo";
+    static final String KEY_ECHO_DELAY = "echoDelay";
+    static final String KEY_ECHO_PING = "echoPing";
 
     private AudioPanel() {
     }
@@ -48,6 +50,9 @@ final class AudioPanel {
         AudioAdjustProcessor.bassDb = clampFx(p.getInt(KEY_BASS, 0));
         AudioAdjustProcessor.trebleDb = clampFx(p.getInt(KEY_TREBLE, 0));
         AudioAdjustProcessor.echoPct = Math.max(0, Math.min(100, p.getInt(KEY_ECHO, 0)));
+        AudioAdjustProcessor.echoDelayMs = Math.max(AudioAdjustProcessor.MIN_ECHO_MS,
+                Math.min(AudioAdjustProcessor.MAX_ECHO_MS, p.getInt(KEY_ECHO_DELAY, 350)));
+        AudioAdjustProcessor.echoPingPong = p.getBoolean(KEY_ECHO_PING, false);
         int d = p.getInt(KEY_DELAY, 0);
         AudioAdjustProcessor.delayMs = Math.max(-AudioAdjustProcessor.MAX_DELAY_MS,
                 Math.min(AudioAdjustProcessor.MAX_DELAY_MS, d));
@@ -66,6 +71,8 @@ final class AudioPanel {
                 .putInt(KEY_BASS, AudioAdjustProcessor.bassDb)
                 .putInt(KEY_TREBLE, AudioAdjustProcessor.trebleDb)
                 .putInt(KEY_ECHO, AudioAdjustProcessor.echoPct)
+                .putInt(KEY_ECHO_DELAY, AudioAdjustProcessor.echoDelayMs)
+                .putBoolean(KEY_ECHO_PING, AudioAdjustProcessor.echoPingPong)
                 .apply();
     }
 

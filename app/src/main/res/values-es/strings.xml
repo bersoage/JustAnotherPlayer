@@ -89,4 +89,7 @@
     <string name="effects_back">Volver al sonido</string>
     <string name="pref_subtitle_encoding">Codificación de subtítulos</string>
     <string name="pref_subtitle_encoding_auto">Automática (ANSI si hay dudas)</string>
+    <string name="effects_echo_delay">Tiempo del eco</string>
+    <string name="effects_echo_mode_normal">Modo del eco: Normal</string>
+    <string name="effects_echo_mode_pingpong">Modo del eco: Rebote (uno y uno)</string>
 </resources>
