@@ -29,6 +29,15 @@ Se ajusta como una tira flotante **sobre el video**, para ver los labios mientra
 
 ![Sincronía (ilustración)](docs/sincronia.png)
 
+### 🧠 Recuerda cada video
+Al volver a un video, retoma su pista de audio, subtítulo, modo de pantalla, velocidad, sincronías, balance, voces, potenciador y efectos.
+
+### 💬 Subtítulos
+Sincronía de subtítulos flotante sobre el video (±10 s) y lectura correcta de archivos en ANSI (acentos y ñ), con opción manual en ajustes.
+
+### 📡 Búfer de red y actualizaciones
+Búfer Normal / Grande / Máximo para archivos pesados por red, con los segundos cargados en el panel de sonido. La app avisa cuando hay una beta nueva y la baja desde GitHub (siempre con tu confirmación).
+
 ### 🌈 Dolby Vision o HDR10, a elección
 Si el archivo trae ambos, elegís cuál reproducir. En HDR10 no hay parpadeo.
 
