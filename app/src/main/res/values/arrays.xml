@@ -12,6 +12,18 @@
     <item>ansi</item>
   </string-array>
 
+  <string-array name="buffer_entries">
+    <item>@string/pref_buffer_normal</item>
+    <item>@string/pref_buffer_large</item>
+    <item>@string/pref_buffer_max</item>
+  </string-array>
+
+  <string-array name="buffer_values">
+    <item>normal</item>
+    <item>large</item>
+    <item>max</item>
+  </string-array>
+
   <string-array name="file_access_entries">
     <item>@string/pref_file_access_auto</item>
     <item>Storage Access Framework</item>

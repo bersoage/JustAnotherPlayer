@@ -25,6 +25,14 @@
             app:entryValues="@array/subtitle_encoding_values"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            app:key="bufferLevel"
+            android:defaultValue="normal"
+            app:title="@string/pref_buffer"
+            app:entries="@array/buffer_entries"
+            app:entryValues="@array/buffer_values"
+            app:useSimpleSummaryProvider="true" />
+
         <SwitchPreferenceCompat
             app:key="frameRateMatching"
             app:defaultValue="false"
@@ -107,6 +115,10 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/pref_about_header">
+
+        <Preference
+            app:key="check_update"
+            app:title="@string/pref_check_update" />
 
         <Preference
             app:key="about_app"
